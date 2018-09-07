@@ -3,86 +3,66 @@
 // Data Grid View Model
 // National Instruments Copyright 2015
 //****************************************
-(function (parent) {
+(function () {
     'use strict';
-    // Static Private Reference Aliases
-    var NI_SUPPORT = NationalInstruments.HtmlVI.NISupport;
-    var NIType = window.NIType;
-    // Constructor Function
-    NationalInstruments.HtmlVI.ViewModels.DataGridViewModel = function (element, model) {
-        parent.call(this, element, model);
-        // Public Instance Properties
-        // None
-        // Private Instance Properties
-        // None
-    };
-    // Static Public Variables
-    // None
-    // Static Public Functions
-    // None
-    // Prototype creation
-    var child = NationalInstruments.HtmlVI.ViewModels.DataGridViewModel;
-    var proto = NI_SUPPORT.inheritFromParent(child, parent);
-    // Static Private Variables
-    // None
-    // Static Private Functions
-    // None
-    // Public Prototype Methods
-    proto.registerViewModelProperties(proto, function (targetPrototype, parentMethodName) {
-        parent.prototype[parentMethodName].call(this, targetPrototype, parentMethodName);
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'rowHeaderVisible' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'columnHeaderVisible' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'showAddRowsToolBar' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'allowSorting' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'allowPaging' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'allowFiltering' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'allowGrouping' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'rowHeight' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'altRowColors' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'altRowStart' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'altRowStep' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'isInEditMode' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'selectedColumn' });
-    });
-    proto.bindToView = function () {
-        parent.prototype.bindToView.call(this);
-        var that = this;
-        that.enableResizeHack();
-        that.bindTextFocusEventListener();
-        that.element.addEventListener('value-changed', function (event) {
-            var newValue, oldValue;
-            if (event.currentTarget === event.target) {
-                newValue = event.detail.newValue;
-                oldValue = event.detail.oldValue;
-                that.model.controlChanged(newValue, oldValue);
-            }
-        });
-        that.element.addEventListener('selected-column-changed', function (event) {
-            that.model.internalControlEventOccurred('DataGridSelectedIndexChanged', event.detail.selectedColumn);
-        });
-    };
-    proto.modelPropertyChanged = function (propertyName) {
-        var renderBuffer = parent.prototype.modelPropertyChanged.call(this, propertyName);
-        switch (propertyName) {
-            case 'value':
-                renderBuffer.properties.valueNonSignaling = this.model.value;
-                break;
-            case 'niType':
-                renderBuffer.properties.niType = this.model.getNITypeString();
-                break;
+    class DataGridViewModel extends NationalInstruments.HtmlVI.ViewModels.VisualViewModel {
+        constructor(element, model) {
+            super(element, model);
+            this.registerAutoSyncProperty('rowHeaderVisible');
+            this.registerAutoSyncProperty('columnHeaderVisible');
+            this.registerAutoSyncProperty('showAddRowsToolBar');
+            this.registerAutoSyncProperty('allowSorting');
+            this.registerAutoSyncProperty('allowPaging');
+            this.registerAutoSyncProperty('allowFiltering');
+            this.registerAutoSyncProperty('allowGrouping');
+            this.registerAutoSyncProperty('rowHeight');
+            this.registerAutoSyncProperty('altRowColors');
+            this.registerAutoSyncProperty('altRowStart');
+            this.registerAutoSyncProperty('altRowStep');
+            this.registerAutoSyncProperty('isInEditMode');
+            this.registerAutoSyncProperty('selectedColumn');
         }
-        return renderBuffer;
-    };
-    proto.updateModelFromElement = function () {
-        parent.prototype.updateModelFromElement.call(this);
-        this.model.niType = new NIType(this.element.niType);
-        this.model.value = this.element.value;
-    };
-    proto.applyModelToElement = function () {
-        parent.prototype.applyModelToElement.call(this);
-        this.element.niType = this.model.getNITypeString();
-        this.element.valueNonSignaling = this.model.value;
-    };
-    NationalInstruments.HtmlVI.NIModelProvider.registerViewModel(child, NationalInstruments.HtmlVI.Elements.DataGrid, NationalInstruments.HtmlVI.Models.DataGridModel);
-}(NationalInstruments.HtmlVI.ViewModels.VisualViewModel));
+        bindToView() {
+            super.bindToView();
+            let that = this;
+            that.enableResizeHack();
+            that.bindTextFocusEventListener();
+            that.element.addEventListener('value-changed', function (event) {
+                let newValue, oldValue;
+                if (event.currentTarget === event.target) {
+                    newValue = event.detail.newValue;
+                    oldValue = event.detail.oldValue;
+                    that.model.controlChanged(newValue, oldValue);
+                }
+            });
+            that.element.addEventListener('selected-column-changed', function (event) {
+                that.model.internalControlEventOccurred('DataGridSelectedIndexChanged', event.detail.selectedColumn);
+            });
+        }
+        modelPropertyChanged(propertyName) {
+            let renderBuffer = super.modelPropertyChanged(propertyName);
+            switch (propertyName) {
+                case 'value':
+                    renderBuffer.properties.valueNonSignaling = this.model.value;
+                    break;
+                case 'niType':
+                    renderBuffer.properties.niType = this.model.getNITypeString();
+                    break;
+            }
+            return renderBuffer;
+        }
+        updateModelFromElement() {
+            super.updateModelFromElement();
+            this.model.niType = new window.NIType(this.element.niType);
+            this.model.value = this.element.value;
+        }
+        applyModelToElement() {
+            super.applyModelToElement();
+            this.element.niType = this.model.getNITypeString();
+            this.element.valueNonSignaling = this.model.value;
+        }
+    }
+    NationalInstruments.HtmlVI.NIModelProvider.registerViewModel(DataGridViewModel, NationalInstruments.HtmlVI.Elements.DataGrid, NationalInstruments.HtmlVI.Models.DataGridModel);
+    NationalInstruments.HtmlVI.ViewModels.DataGridViewModel = DataGridViewModel;
+})();
 //# sourceMappingURL=niDataGridViewModel.js.map

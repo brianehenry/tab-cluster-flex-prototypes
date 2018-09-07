@@ -61,22 +61,9 @@
             case GPropertyNameConstants.VALUE:
                 this.value = gPropertyValue;
                 break;
-            default:
-                parent.prototype.setGPropertyValue.call(this, gPropertyName, gPropertyValue);
-        }
-    };
-    proto.getGPropertyValue = function (gPropertyName) {
-        switch (gPropertyName) {
-            case GPropertyNameConstants.VALUE:
-                return this.value;
-            default:
-                return parent.prototype.getGPropertyValue.call(this, gPropertyName);
-        }
-    };
-    proto.setGPropertyValue = function (gPropertyName, gPropertyValue) {
-        switch (gPropertyName) {
-            case GPropertyNameConstants.VALUE:
-                this.value = gPropertyValue;
+            case GPropertyNameConstants.VALUE_SIGNALING:
+                var oldValue = this.value;
+                this.controlChanged(gPropertyValue, oldValue);
                 break;
             default:
                 parent.prototype.setGPropertyValue.call(this, gPropertyName, gPropertyValue);

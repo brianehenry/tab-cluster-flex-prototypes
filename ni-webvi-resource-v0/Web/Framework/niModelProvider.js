@@ -42,7 +42,7 @@
         }
         throw new Error('Cannot find model constructor with kind: ' + kind);
     };
-    proto.registerViewModel = function (viewModelConstructor, elementConstructor, modelConstructor, elementTagName) {
+    proto.registerViewModel = function (viewModelType, elementConstructor, modelType, elementTagName) {
         var tagName;
         if (elementTagName !== undefined) {
             tagName = elementTagName;
@@ -50,13 +50,9 @@
         else {
             tagName = elementConstructor.prototype.elementInfo.tagName;
         }
-        TagMap[tagName] = modelConstructor.MODEL_KIND;
-        ModelKindMap[modelConstructor.MODEL_KIND] = tagName;
-        ViewModelFactory[modelConstructor.MODEL_KIND] = function () {
-            var obj = Object.create(viewModelConstructor.prototype);
-            var constructorReturnValue = viewModelConstructor.apply(obj, arguments);
-            return (constructorReturnValue === undefined) ? obj : constructorReturnValue;
-        };
+        TagMap[tagName] = modelType.MODEL_KIND;
+        ModelKindMap[modelType.MODEL_KIND] = tagName;
+        ViewModelFactory[modelType.MODEL_KIND] = viewModelType;
     };
     proto.makeViewModel = function (element, model) {
         var kind = TagMap[element.elementInfo.tagName];
@@ -66,7 +62,7 @@
         if (typeof ViewModelFactory[kind] !== 'function') {
             throw new Error('Cannot find viewmodel constructor function for model kind: ' + kind);
         }
-        return ViewModelFactory[kind](element, model);
+        return new ViewModelFactory[kind](element, model);
     };
     proto.tagNameToModelKind = function (elementTag) {
         if (typeof TagMap[elementTag] !== 'string') {

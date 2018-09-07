@@ -3,61 +3,46 @@
 // GraphBase View Model
 // National Instruments Copyright 2016
 //****************************************
-(function (parent) {
+(function () {
     'use strict';
-    // Static Private Reference Aliases
-    var NI_SUPPORT = NationalInstruments.HtmlVI.NISupport;
-    // Constructor Function
-    NationalInstruments.HtmlVI.ViewModels.GraphBaseViewModel = function (element, model) {
-        parent.call(this, element, model);
-    };
-    // Static Public Variables
-    // None
-    // Static Public Functions
-    // None
-    // Prototype creation
-    var child = NationalInstruments.HtmlVI.ViewModels.GraphBaseViewModel;
-    var proto = NI_SUPPORT.inheritFromParent(child, parent);
-    // Static Private Variables
-    // None
-    // Static Private Functions
-    // None
-    proto.modelPropertyChanged = function (propertyName) {
-        var renderBuffer = parent.prototype.modelPropertyChanged.call(this, propertyName);
-        switch (propertyName) {
-            case 'plotAreaMargin':
-                renderBuffer.properties.plotAreaMargin = this.model.plotAreaMargin;
-                break;
-            case 'niType':
-                renderBuffer.properties.niType = this.model.getNITypeString();
-                break;
+    class GraphBaseViewModel extends NationalInstruments.HtmlVI.ViewModels.VisualViewModel {
+        constructor(element, model) {
+            super(element, model);
+            this.registerAutoSyncProperty('graphRef');
         }
-        return renderBuffer;
-    };
-    proto.registerViewModelProperties(proto, function (targetPrototype, parentMethodName) {
-        parent.prototype[parentMethodName].call(this, targetPrototype, parentMethodName);
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'graphRef' });
-    });
-    proto.updateModelFromElement = function () {
-        parent.prototype.updateModelFromElement.call(this);
-        if (this.element.niType) {
-            this.model.niType = new window.NIType(this.element.niType);
+        modelPropertyChanged(propertyName) {
+            let renderBuffer = super.modelPropertyChanged(propertyName);
+            switch (propertyName) {
+                case 'plotAreaMargin':
+                    renderBuffer.properties.plotAreaMargin = this.model.plotAreaMargin;
+                    break;
+                case 'niType':
+                    renderBuffer.properties.niType = this.model.getNITypeString();
+                    break;
+            }
+            return renderBuffer;
         }
-    };
-    proto.applyModelToElement = function () {
-        parent.prototype.applyModelToElement.call(this);
-        this.element.niType = this.model.getNITypeString();
-    };
-    // Public Prototype Methods
-    proto.bindToView = function () {
-        var that = this;
-        var insideGraphBaseEventName = 'InsideGraphBase';
-        that.element.addEventListener('mouseenter', function () {
-            that.model.internalControlEventOccurred(insideGraphBaseEventName, true);
-        });
-        that.element.addEventListener('mouseleave', function () {
-            that.model.internalControlEventOccurred(insideGraphBaseEventName, false);
-        });
-    };
-}(NationalInstruments.HtmlVI.ViewModels.VisualViewModel));
+        updateModelFromElement() {
+            super.updateModelFromElement();
+            if (this.element.niType) {
+                this.model.niType = new window.NIType(this.element.niType);
+            }
+        }
+        applyModelToElement() {
+            super.applyModelToElement(this);
+            this.element.niType = this.model.getNITypeString();
+        }
+        bindToView() {
+            let that = this;
+            let insideGraphBaseEventName = 'InsideGraphBase';
+            that.element.addEventListener('mouseenter', function () {
+                that.model.internalControlEventOccurred(insideGraphBaseEventName, true);
+            });
+            that.element.addEventListener('mouseleave', function () {
+                that.model.internalControlEventOccurred(insideGraphBaseEventName, false);
+            });
+        }
+    }
+    NationalInstruments.HtmlVI.ViewModels.GraphBaseViewModel = GraphBaseViewModel;
+})();
 //# sourceMappingURL=niGraphBaseViewModel.js.map

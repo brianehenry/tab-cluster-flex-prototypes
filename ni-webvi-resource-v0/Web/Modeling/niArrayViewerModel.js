@@ -62,6 +62,10 @@
             case GPropertyNameConstants.VALUE:
                 this.value = gPropertyValue;
                 break;
+            case GPropertyNameConstants.VALUE_SIGNALING:
+                var oldValue = this.value;
+                this.controlChanged(gPropertyValue, oldValue);
+                break;
             case GPropertyNameConstants.VISIBLEROWS:
                 {
                     let currentVisibleColumnsValue = parseRowsAndColumns(this.rowsAndColumns, INDEX_FOR_COLUMN);

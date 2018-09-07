@@ -3,39 +3,20 @@
 // CartesianPlot View Model
 // National Instruments Copyright 2014
 //****************************************
-(function (parent) {
+(function () {
     'use strict';
-    // Static Private Reference Aliases
-    var NI_SUPPORT = NationalInstruments.HtmlVI.NISupport;
-    // Constructor Function
-    NationalInstruments.HtmlVI.ViewModels.CartesianPlotViewModel = function (element, model) {
-        parent.call(this, element, model);
-        // Public Instance Properties
-        // None
-        // Private Instance Properties
-        // None
-    };
-    // Static Public Variables
-    // None
-    // Static Public Functions
-    // None
-    // Prototype creation
-    var child = NationalInstruments.HtmlVI.ViewModels.CartesianPlotViewModel;
-    var proto = NI_SUPPORT.inheritFromParent(child, parent);
-    // Static Private Variables
-    // None
-    // Static Private Functions
-    // None
-    // Public Prototype Methods
-    proto.registerViewModelProperties(proto, function (targetPrototype, parentMethodName) {
-        parent.prototype[parentMethodName].call(this, targetPrototype, parentMethodName);
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'label' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'show' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'xaxis' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'yaxis' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'enableHover' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'hoverFormat' });
-    });
-    NationalInstruments.HtmlVI.NIModelProvider.registerViewModel(child, NationalInstruments.HtmlVI.Elements.CartesianPlot, NationalInstruments.HtmlVI.Models.CartesianPlotModel, 'ni-cartesian-plot');
-}(NationalInstruments.HtmlVI.ViewModels.VisualViewModel));
+    class CartesianPlotViewModel extends NationalInstruments.HtmlVI.ViewModels.VisualViewModel {
+        constructor(element, model) {
+            super(element, model);
+            this.registerAutoSyncProperty('label');
+            this.registerAutoSyncProperty('show');
+            this.registerAutoSyncProperty('xaxis');
+            this.registerAutoSyncProperty('yaxis');
+            this.registerAutoSyncProperty('enableHover');
+            this.registerAutoSyncProperty('hoverFormat');
+        }
+    }
+    NationalInstruments.HtmlVI.NIModelProvider.registerViewModel(CartesianPlotViewModel, NationalInstruments.HtmlVI.Elements.CartesianPlot, NationalInstruments.HtmlVI.Models.CartesianPlotModel, 'ni-cartesian-plot');
+    NationalInstruments.HtmlVI.ViewModels.CartesianPlotViewModel = CartesianPlotViewModel;
+})();
 //# sourceMappingURL=niCartesianPlotViewModel.js.map

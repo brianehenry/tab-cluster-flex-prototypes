@@ -499,7 +499,8 @@
             var proto = DataGrid.prototype;
             Object.defineProperty(proto, 'value', {
                 get: function () {
-                    return this.parsedValue;
+                    // it should deep copy to prevent internal state from being coupled externally
+                    return this.deepCloneData();
                 },
                 set: function (val) {
                     var oldValue = this.deepCloneData();
@@ -511,7 +512,7 @@
             });
             Object.defineProperty(proto, 'valueNonSignaling', {
                 get: function () {
-                    return this.parsedValue;
+                    return this.deepCloneData();
                 },
                 set: function (val) {
                     this.updateData(val);

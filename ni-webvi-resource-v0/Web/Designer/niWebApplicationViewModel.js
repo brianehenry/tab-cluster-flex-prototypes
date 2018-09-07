@@ -3,98 +3,87 @@
 // Web Application View Model
 // National Instruments Copyright 2014
 //****************************************
-(function (parent) {
+(function () {
     'use strict';
     // Static Private Reference Aliases
-    var NI_SUPPORT = NationalInstruments.HtmlVI.NISupport;
-    var SERVICE_STATE_ENUM = NationalInstruments.HtmlVI.Elements.WebApplication.ServiceStateEnum;
-    // Constructor Function
-    NationalInstruments.HtmlVI.ViewModels.WebApplicationViewModel = function (element, model) {
-        parent.call(this, element, model);
-        if (this.model instanceof NationalInstruments.HtmlVI.Models.WebApplicationModel === false) {
-            throw new Error(NI_SUPPORT.i18n('msg_INVALID_VI_MODEL'));
-        }
-        if (this.element instanceof NationalInstruments.HtmlVI.Elements.WebApplication === false) {
-            throw new Error(NI_SUPPORT.i18n('msg_INVALID_ELEMENT'));
-        }
-        // Public Instance Properties
-        // None
-        // Private Instance Properties
-        this._autoStartOccurred = false;
-    };
-    // Static Public Variables
-    // None
-    // Static Public Functions
-    // None
-    // Prototype creation
-    var child = NationalInstruments.HtmlVI.ViewModels.WebApplicationViewModel;
-    var proto = NI_SUPPORT.inheritFromParent(child, parent);
-    // Static Private Variables
-    // None
+    const NI_SUPPORT = NationalInstruments.HtmlVI.NISupport;
+    const SERVICE_STATE_ENUM = NationalInstruments.HtmlVI.Elements.WebApplication.ServiceStateEnum;
     // Static Private Functions
     // TODO mraj niskipsync used for development only until we have improved deployment testing
-    var isBrowserPreventEditorModeEnabled = function () {
-        var preventEditorMode = (window.location.hash.indexOf('niskipsync') !== -1);
+    const isBrowserPreventEditorModeEnabled = function () {
+        let preventEditorMode = (window.location.hash.indexOf('niskipsync') !== -1);
         return preventEditorMode;
     };
-    // Public Prototype Methods
-    proto.bindToView = function () {
-        parent.prototype.bindToView.call(this);
-        var that = this;
-        NI_SUPPORT.logVerbose('niWebApplicationViewModel bindToView()');
-        that.element.addEventListener('requested-start', function (evt) {
-            NI_SUPPORT.logVerbose('niWebApplicationViewModel requested-start');
-            if (that.element === evt.detail.element) {
-                that.model.start();
+    class WebApplicationViewModel extends NationalInstruments.HtmlVI.ViewModels.NIViewModel {
+        // Constructor Function
+        constructor(element, model) {
+            super(element, model);
+            if (this.model instanceof NationalInstruments.HtmlVI.Models.WebApplicationModel === false) {
+                throw new Error(NI_SUPPORT.i18n('msg_INVALID_VI_MODEL'));
             }
-        });
-        that.element.addEventListener('requested-stop', function (evt) {
-            NI_SUPPORT.logVerbose('niWebApplicationViewModel requested-stop');
-            if (that.element === evt.detail.element) {
-                that.model.stop();
+            if (this.element instanceof NationalInstruments.HtmlVI.Elements.WebApplication === false) {
+                throw new Error(NI_SUPPORT.i18n('msg_INVALID_ELEMENT'));
             }
-        });
-        that.model.initializeService();
-    };
-    proto.modelPropertyChanged = function (propertyName) {
-        var renderBuffer = parent.prototype.modelPropertyChanged.call(this, propertyName);
-        var that = this;
-        switch (propertyName) {
-            case 'serviceState':
-                // Assign to the element directly as renderBuffer is buffered and debounced so may lose samples
-                that.element.serviceState = that.model.serviceState;
-                NI_SUPPORT.logVerbose('niWebApplicationViewModel modelPropertyChanged serviceState=' + that.model.serviceState);
-                if (that.model.checkServiceStateIs(SERVICE_STATE_ENUM.READY) && that.model.disableAutoStart === false && that._autoStartOccurred === false) {
-                    that._autoStartOccurred = true;
+            // Public Instance Properties
+            // None
+            // Private Instance Properties
+            this._autoStartOccurred = false;
+        }
+        // Public Prototype Methods
+        bindToView() {
+            super.bindToView();
+            let that = this;
+            NI_SUPPORT.logVerbose('niWebApplicationViewModel bindToView()');
+            that.element.addEventListener('requested-start', function (evt) {
+                NI_SUPPORT.logVerbose('niWebApplicationViewModel requested-start');
+                if (that.element === evt.detail.element) {
                     that.model.start();
                 }
-                break;
+            });
+            that.element.addEventListener('requested-stop', function (evt) {
+                NI_SUPPORT.logVerbose('niWebApplicationViewModel requested-stop');
+                if (that.element === evt.detail.element) {
+                    that.model.stop();
+                }
+            });
+            that.model.initializeService();
         }
-        return renderBuffer;
-    };
-    proto.updateModelFromElement = function () {
-        parent.prototype.updateModelFromElement.call(this);
-        var model = this.model, element = this.element;
-        model.engine = element.engine;
-        model.location = element.location;
-        model.vireoSource = element.vireoSource;
-        model.remoteAddress = element.remoteAddress;
-        model.testMode = element.testMode;
-        model.disableAutoStart = element.disableAutoStart;
-        model.serviceState = element.serviceState;
-        model.vireoTotalMemory = element.vireoTotalMemory;
-        // Gets this parameter from the view, but not the element. Until we support deployment from the IDE,
-        // the only way to set the page to "deployed"/"browser" mode is via the custom #niskipsync url
-        if (isBrowserPreventEditorModeEnabled()) {
-            model.location = '';
-            model.engine = '';
-            model.testMode = true;
+        modelPropertyChanged(propertyName) {
+            let renderBuffer = super.modelPropertyChanged(propertyName);
+            let that = this;
+            switch (propertyName) {
+                case 'serviceState':
+                    // Assign to the element directly as renderBuffer is buffered and debounced so may lose samples
+                    that.element.serviceState = that.model.serviceState;
+                    NI_SUPPORT.logVerbose('niWebApplicationViewModel modelPropertyChanged serviceState=' + that.model.serviceState);
+                    if (that.model.checkServiceStateIs(SERVICE_STATE_ENUM.READY) && that.model.disableAutoStart === false && that._autoStartOccurred === false) {
+                        that._autoStartOccurred = true;
+                        that.model.start();
+                    }
+                    break;
+            }
+            return renderBuffer;
         }
-    };
-    // Unused becasue ni-web-application is not created from model settings
-    //
-    // proto.applyModelToElement = function () {
-    //     parent.prototype.applyModelToElement.call(this);
-    // };
-}(NationalInstruments.HtmlVI.ViewModels.NIViewModel));
+        updateModelFromElement() {
+            super.updateModelFromElement();
+            let model = this.model, element = this.element;
+            model.engine = element.engine;
+            model.location = element.location;
+            model.vireoSource = element.vireoSource;
+            model.remoteAddress = element.remoteAddress;
+            model.testMode = element.testMode;
+            model.disableAutoStart = element.disableAutoStart;
+            model.serviceState = element.serviceState;
+            model.vireoTotalMemory = element.vireoTotalMemory;
+            // Gets this parameter from the view, but not the element. Until we support deployment from the IDE,
+            // the only way to set the page to "deployed"/"browser" mode is via the custom #niskipsync url
+            if (isBrowserPreventEditorModeEnabled()) {
+                model.location = '';
+                model.engine = '';
+                model.testMode = true;
+            }
+        }
+    }
+    NationalInstruments.HtmlVI.ViewModels.WebApplicationViewModel = WebApplicationViewModel;
+})();
 //# sourceMappingURL=niWebApplicationViewModel.js.map

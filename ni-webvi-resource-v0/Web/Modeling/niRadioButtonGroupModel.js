@@ -8,6 +8,7 @@
     // Static Private Reference Aliases
     var NI_SUPPORT = NationalInstruments.HtmlVI.NISupport;
     var ORIENTATION_ENUM = NationalInstruments.HtmlVI.Elements.RadioButtonGroup.OrientationEnum;
+    let GPropertyNameConstants = NationalInstruments.HtmlVI.GPropertyNameConstants;
     // Constructor Function
     NationalInstruments.HtmlVI.Models.RadioButtonGroupModel = function (id) {
         parent.call(this, id);
@@ -38,16 +39,18 @@
     });
     proto.setGPropertyValue = function (gPropertyName, gPropertyValue) {
         switch (gPropertyName) {
-            case 'Items':
-                throw new Error("Property " + gPropertyName + " not supported for enum control.");
+            case GPropertyNameConstants.ITEMS:
+            case GPropertyNameConstants.DISABLED_INDEXES:
+                throw new Error("Property " + gPropertyName + " not supported for radio button control.");
             default:
                 parent.prototype.setGPropertyValue.call(this, gPropertyName, gPropertyValue);
         }
     };
     proto.getGPropertyValue = function (gPropertyName) {
         switch (gPropertyName) {
-            case 'Items':
-                throw new Error("Property " + gPropertyName + " not supported for enum control.");
+            case GPropertyNameConstants.ITEMS:
+            case GPropertyNameConstants.DISABLED_INDEXES:
+                throw new Error("Property " + gPropertyName + " not supported for radio button control.");
             default:
                 return parent.prototype.getGPropertyValue.call(this, gPropertyName);
         }

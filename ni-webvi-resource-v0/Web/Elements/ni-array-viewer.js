@@ -201,7 +201,8 @@
             var proto = ArrayViewer.prototype;
             Object.defineProperty(proto, 'value', {
                 get: function () {
-                    return this._arrayValue;
+                    // it should deep copy to prevent internal state from being coupled externally
+                    return DEEP_COPY_CONVERTER.deepCopy(this._arrayValue);
                 },
                 set: function (val) {
                     setArrayValue(this, val, true);
@@ -211,7 +212,7 @@
             });
             Object.defineProperty(proto, 'valueNonSignaling', {
                 get: function () {
-                    return this._arrayValue;
+                    return DEEP_COPY_CONVERTER.deepCopy(this._arrayValue);
                 },
                 set: function (val) {
                     setArrayValue(this, val, false);

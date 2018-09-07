@@ -42,17 +42,33 @@
             return parseFloat(value1) === parseFloat(value2);
         }
     };
+    var resetUnselectableFromAllItems = function (dropdownElement) {
+        var itemList = dropdownElement.items;
+        if (itemList === undefined) {
+            return;
+        }
+        for (var i = 0; i < itemList.length; i++) {
+            if (itemList[i].unselectable) {
+                itemList[i].unselectable = false;
+            }
+        }
+    };
     class NumericValueSelector extends NationalInstruments.HtmlVI.Elements.Visual {
         // Public Prototype Methods
         createdCallback() {
             super.createdCallback();
             this.itemsArray = [];
+            this.disabledIndexesArray = [];
             this._itemsUpdating = false;
             this._hasUndefinedValue = false;
         }
         addAllProperties(targetPrototype) {
             super.addAllProperties(targetPrototype);
             var proto = NumericValueSelector.prototype;
+            proto.addProperty(targetPrototype, {
+                propertyName: 'disabledIndexes',
+                defaultValue: '[]'
+            });
             proto.addProperty(targetPrototype, {
                 propertyName: 'value',
                 defaultValue: { stringValue: '0', numberValue: 0 },
@@ -77,11 +93,15 @@
             var firstCall = super.attachedCallback();
             if (firstCall === true) {
                 this.refreshItemsArray();
+                this.refreshDisabledIndexesArray();
             }
             return firstCall;
         }
         refreshItemsArray() {
             this.itemsArray = JSON.parse(this.items);
+        }
+        refreshDisabledIndexesArray() {
+            this.disabledIndexesArray = JSON.parse(this.disabledIndexes);
         }
         createSource() {
             var source = [];
@@ -169,6 +189,18 @@
             dropdownElement.selectedIndexes = [selectedIndex];
             this._itemsUpdating = false;
         }
+        setDisabledIndexes(dropdownElement) {
+            resetUnselectableFromAllItems(dropdownElement);
+            var itemList = dropdownElement.items;
+            var disabledIndexes = this.disabledIndexesArray;
+            for (var i = 0; i < disabledIndexes.length; i++) {
+                if (disabledIndexes[i] < itemList.length &&
+                    disabledIndexes[i] >= 0 &&
+                    !itemList[disabledIndexes[i]].unselectable) {
+                    itemList[disabledIndexes[i]].unselectable = true;
+                }
+            }
+        }
         propertyUpdatedHelper(propertyName, dropdownElement, allowCreateNewSelectedItem) {
             var selectedIndex;
             switch (propertyName) {
@@ -183,18 +215,26 @@
                         var niType = getNumericNIType(this);
                         this.value = selectorItemValueToNIElementNumericValue(this.itemsArray[selectedIndex].value, niType);
                         this._itemsUpdating = false;
+                        this.setDisabledIndexes(dropdownElement);
                     }
+                    break;
+                case 'disabledIndexes':
+                    this.refreshDisabledIndexesArray();
+                    this.setDisabledIndexes(dropdownElement);
                     break;
                 case 'value':
                     if (allowCreateNewSelectedItem === false) {
                         selectedIndex = this.findValue();
                         dropdownElement.selectedIndexes = selectedIndex === -1 ? [0] : [selectedIndex];
                     }
-                    else if (this.findValue() === -1) {
-                        this.addUndefinedValue(dropdownElement);
-                    }
                     else {
-                        this.removeUndefinedValue(dropdownElement);
+                        if (this.findValue() === -1) {
+                            this.addUndefinedValue(dropdownElement);
+                        }
+                        else {
+                            this.removeUndefinedValue(dropdownElement);
+                        }
+                        this.setDisabledIndexes(dropdownElement);
                     }
                     break;
                 case 'readOnly':

@@ -40,6 +40,7 @@
                 });
                 // Attach after all attributes are set to prevent early value change events
                 this.appendChild(dropDownChildElement);
+                this.setDisabledIndexes(dropDownChildElement);
             }
             return firstCall;
         }
@@ -60,6 +61,9 @@
                     }
                     break;
                 case 'disabled':
+                    this.propertyUpdatedHelper(propertyName, this.firstElementChild, false);
+                    break;
+                case 'disabledIndexes':
                     this.propertyUpdatedHelper(propertyName, this.firstElementChild, false);
                     break;
                 default:

@@ -77,6 +77,7 @@
                 customElements.whenDefined(numericInput.localName).then(function () {
                     that.numericInputDefined = true;
                 });
+                this.setDisabledIndexes(dropDownContainer);
             }
             return firstCall;
         }
@@ -128,6 +129,9 @@
                 case 'disabled':
                     this.propertyUpdatedHelper(propertyName, dropdown, false);
                     numericInput.disabled = this.disabled;
+                    break;
+                case 'disabledIndexes':
+                    this.propertyUpdatedHelper(propertyName, dropdown, false);
                     break;
                 default:
                     break;

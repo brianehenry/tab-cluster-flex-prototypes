@@ -23,12 +23,6 @@
     align-items: center;
 }
 
-/* Remove the FrontPanelWrapper centering CSS for flexible layout.  Applied to the FrontPanelWrapper object. */
-.front-panel-wrapper-relative {
-    display: initial;
-    flex-direction: initial;
-    align-items: initial;
-}
 
 /* Clip the front panel canvas to its bounds, for run panel and deployed pages.  Applied to the FrontPanelCanvas. */
 ni-front-panel {
@@ -41,7 +35,6 @@ ni-front-panel {
 ni-front-panel.ni-relative-layout {
     --ni-child-control-position: static;
     box-sizing: border-box;
-    margin: 0 auto;
     padding: 2.5em;
     max-width: 1280px;
     height: auto;

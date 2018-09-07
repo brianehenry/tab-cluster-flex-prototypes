@@ -33,6 +33,7 @@
         parent.prototype[parentMethodName].call(this, targetPrototype, parentMethodName);
         proto.addModelProperty(targetPrototype, { propertyName: 'value', defaultValue: 0 });
         proto.addModelProperty(targetPrototype, { propertyName: 'items', defaultValue: [] });
+        proto.addModelProperty(targetPrototype, { propertyName: 'disabledIndexes', defaultValue: [] });
         proto.addModelProperty(targetPrototype, { propertyName: 'popupEnabled', defaultValue: false });
     });
     proto.propertyUsesNITypeProperty = function (propertyName) {
@@ -60,6 +61,9 @@
             case GPropertyNameConstants.VALUE_SIGNALING:
                 this.controlChanged(MathHelpers.clamp(gPropertyValue, 0, this.items.length - 1));
                 break;
+            case GPropertyNameConstants.DISABLED_INDEXES:
+                this.disabledIndexes = gPropertyValue;
+                break;
             default:
                 parent.prototype.setGPropertyValue.call(this, gPropertyName, gPropertyValue);
         }
@@ -70,6 +74,8 @@
                 return this.items.map(x => x.displayValue);
             case GPropertyNameConstants.VALUE:
                 return this.value;
+            case GPropertyNameConstants.DISABLED_INDEXES:
+                return this.disabledIndexes;
             default:
                 return parent.prototype.getGPropertyValue.call(this, gPropertyName);
         }

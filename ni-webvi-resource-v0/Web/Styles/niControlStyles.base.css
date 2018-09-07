@@ -564,6 +564,13 @@ jqx-list-box jqx-scroll-bar:not([orientation='vertical']) {
 }
 
 /*************************************
+* List item
+**************************************/
+jqx-list-item[unselectable] {
+    opacity: 0.65;
+}
+
+/*************************************
 * Dropdown
 **************************************/
 
@@ -1507,8 +1514,17 @@ ni-array-viewer div.jqx-array-central-container {
 	display: inline-block !important;
 }
 
+ni-array-viewer div.jqx-array-scrollbar-container-vertical,
+ni-array-viewer div.jqx-array-scrollbar-container-horizontal {
+    display: none !important;
+}
+
 ni-array-viewer[vertical-scrollbar-visibility] div.jqx-array-scrollbar-container-vertical {
 	display: inline-block !important;	
+}
+
+ni-array-viewer[horizontal-scrollbar-visibility] div.jqx-array-scrollbar-container-horizontal {
+    display: block !important;
 }
 
 ni-array-viewer[vertical-scrollbar-visibility] .jqx-array-scrollbar-vertical {
@@ -1523,8 +1539,13 @@ ni-array-viewer[horizontal-scrollbar-visibility] .jqx-array-scrollbar-horizontal
    (just disabled / grayed out in right rail) so it's also sent to JS that way. However we don't want to render it
    (it would overlap the controls).
 */
-ni-array-viewer[dimensions="1"][orientation="horizontal"][vertical-scrollbar-visibility] .jqx-array-scrollbar-container-vertical,
-ni-array-viewer[dimensions="1"][orientation="vertical"][horizontal-scrollbar-visibility] .jqx-array-scrollbar-container-horizontal {
+ni-array-viewer[dimensions="1"][orientation="horizontal"][vertical-scrollbar-visibility] div.jqx-array-scrollbar-container-vertical,
+ni-array-viewer[dimensions="1"][orientation="vertical"][horizontal-scrollbar-visibility] div.jqx-array-scrollbar-container-horizontal {
+    display: none !important;
+}
+
+/* Bug workaround, see CAR 712004 */
+ni-array-viewer[dimensions="1"][rows-and-columns="1,1"] div.jqx-array-scrollbar-container-vertical {
     display: none !important;
 }
 

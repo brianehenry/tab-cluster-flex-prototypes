@@ -28,6 +28,12 @@ class GPropertyNameConstants {
     static get VISIBLECOLUMNS() {
         return "VisibleColumns";
     }
+    static get DISABLED_INDEXES() {
+        return "DisabledIndexes";
+    }
+    static get ITEMS_AND_VALUES() {
+        return "ItemsAndValues";
+    }
 }
 // @ts-ignore
 NationalInstruments.HtmlVI.GPropertyNameConstants = GPropertyNameConstants;

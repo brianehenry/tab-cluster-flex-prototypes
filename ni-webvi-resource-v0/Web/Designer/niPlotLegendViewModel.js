@@ -3,56 +3,37 @@
 // PlotLegend View Model
 // National Instruments Copyright 2015
 //****************************************
-(function (parent) {
+(function () {
     'use strict';
-    // Static Private Reference Aliases
-    var NI_SUPPORT = NationalInstruments.HtmlVI.NISupport;
-    // Constructor Function
-    NationalInstruments.HtmlVI.ViewModels.PlotLegendViewModel = function (element, model) {
-        parent.call(this, element, model);
-        // Public Instance Properties
-        // None
-        // Private Instance Properties
-        // None
-    };
-    // Static Public Variables
-    // None
-    // Static Public Functions
-    // None
-    // Prototype creation
-    var child = NationalInstruments.HtmlVI.ViewModels.PlotLegendViewModel;
-    var proto = NI_SUPPORT.inheritFromParent(child, parent);
-    // Static Private Variables
-    // None
-    // Static Private Functions
-    // None
-    // Public Prototype Methods
-    proto.registerViewModelProperties(proto, function (targetPrototype, parentMethodName) {
-        parent.prototype[parentMethodName].call(this, targetPrototype, parentMethodName);
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'graphRef' });
-        proto.addViewModelProperty(targetPrototype, { propertyName: 'isInEditMode' });
-    });
-    proto.userInteractionChanged = function (newState, operationKind) {
-        if (newState === 'start') {
-            // Brace yourself. The user is coming
-            this.element.throttlePlotUpdates(true);
+    class PlotLegendViewModel extends NationalInstruments.HtmlVI.ViewModels.VisualViewModel {
+        constructor(element, model) {
+            super(element, model);
+            this.registerAutoSyncProperty('graphRef');
+            this.registerAutoSyncProperty('isInEditMode');
         }
-        if (newState === 'end') {
-            // End of the user interaction
-            this.element.throttlePlotUpdates(false);
+        userInteractionChanged(newState, operationKind) {
+            if (newState === 'start') {
+                // Brace yourself. The user is coming
+                this.element.throttlePlotUpdates(true);
+            }
+            if (newState === 'end') {
+                // End of the user interaction
+                this.element.throttlePlotUpdates(false);
+            }
+            if (newState === 'atomicactioncomplete') {
+                // the plots and renderers are in a consistent state, take the opportunity and display them.
+                this.element.syncPlotLegendWithGraph();
+            }
+            super.userInteractionChanged(newState, operationKind);
         }
-        if (newState === 'atomicactioncomplete') {
-            // the plots and renderers are in a consistent state, take the opportunity and display them.
-            this.element.syncPlotLegendWithGraph();
+        updateModelFromElement() {
+            super.updateModelFromElement();
+            // TODO mraj what is this about?
+            this.model.height = 'auto';
+            this.element.style.height = 'auto';
         }
-        parent.prototype.userInteractionChanged.call(this, newState, operationKind);
-    };
-    proto.updateModelFromElement = function () {
-        parent.prototype.updateModelFromElement.call(this);
-        // TODO mraj what is this about?
-        this.model.height = 'auto';
-        this.element.style.height = 'auto';
-    };
-    NationalInstruments.HtmlVI.NIModelProvider.registerViewModel(child, NationalInstruments.HtmlVI.Elements.PlotLegend, NationalInstruments.HtmlVI.Models.PlotLegendModel, 'ni-plot-legend');
-}(NationalInstruments.HtmlVI.ViewModels.VisualViewModel));
+    }
+    NationalInstruments.HtmlVI.NIModelProvider.registerViewModel(PlotLegendViewModel, NationalInstruments.HtmlVI.Elements.PlotLegend, NationalInstruments.HtmlVI.Models.PlotLegendModel, 'ni-plot-legend');
+    NationalInstruments.HtmlVI.ViewModels.PlotLegendViewModel = PlotLegendViewModel;
+})();
 //# sourceMappingURL=niPlotLegendViewModel.js.map

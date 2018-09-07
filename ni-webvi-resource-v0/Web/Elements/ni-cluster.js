@@ -183,17 +183,20 @@
             var proto = Cluster.prototype;
             Object.defineProperty(proto, 'value', {
                 get: function () {
-                    return this._clusterValue;
+                    return DEEP_COPY_CONVERTER.deepCopy(this._clusterValue);
                 },
-                set: function (val) {
-                    var oldValue = DEEP_COPY_CONVERTER.deepCopy(this._clusterValue);
-                    this._clusterValue = val;
+                set: function (newValue) {
+                    var oldValue = this._clusterValue;
+                    if (DEEP_COPY_CONVERTER.isDeepEqual(oldValue, newValue)) {
+                        return;
+                    }
+                    this._clusterValue = DEEP_COPY_CONVERTER.deepCopy(newValue);
                     this.dispatchEvent(new CustomEvent('value-changed', {
                         bubbles: true,
                         cancelable: false,
                         detail: {
-                            newValue: val,
-                            oldValue: oldValue
+                            newValue: newValue,
+                            oldValue: oldValue // Pass internal value directly to the event. We already replaced internal value with a copy.
                         }
                     }));
                     if (this._childValueChanging === false) {
@@ -205,10 +208,13 @@
             });
             Object.defineProperty(proto, 'valueNonSignaling', {
                 get: function () {
-                    return this._clusterValue;
+                    return DEEP_COPY_CONVERTER.deepCopy(this._clusterValue);
                 },
-                set: function (val) {
-                    this._clusterValue = val;
+                set: function (newValue) {
+                    if (DEEP_COPY_CONVERTER.isDeepEqual(this._clusterValue, newValue)) {
+                        return;
+                    }
+                    this._clusterValue = DEEP_COPY_CONVERTER.deepCopy(newValue);
                     if (this._childValueChanging === false) {
                         this.updateChildValues();
                     }
@@ -263,6 +269,8 @@
         }
         connectedCallback() {
             // Private Instance Properties
+            // Every time _clusterValue will be modified externally or return it's value
+            // it should deep copy to prevent internal state from being coupled externally
             this._clusterValue = parseInitialValue(this.getAttribute('value'));
             this._niTypeInstance = new NIType(this.niType);
             super.connectedCallback(); // Call the base implementation after having set any properties that are expected to be synced to the model.
@@ -312,7 +320,7 @@
                 return false;
             }
             var fields = this._niTypeInstance.getFields();
-            var newValue = this._clusterValue;
+            var newValue = DEEP_COPY_CONVERTER.deepCopy(this._clusterValue);
             var currField, currChild;
             var i = 0;
             for (i = 0; i < fields.length; i++) {
